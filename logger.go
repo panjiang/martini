@@ -1,14 +1,28 @@
 package martini
 
 import (
-	"log"
 	"net/http"
 	"time"
 )
 
+// ILogger logger interface
+type ILogger interface {
+	Print(v ...interface{})
+	Printf(format string, v ...interface{})
+	Println(v ...interface{})
+
+	Fatal(v ...interface{})
+	Fatalf(format string, v ...interface{})
+	Fatalln(v ...interface{})
+
+	Panic(v ...interface{})
+	Panicf(format string, v ...interface{})
+	Panicln(v ...interface{})
+}
+
 // Logger returns a middleware handler that logs the request as it goes in and the response as it goes out.
 func Logger() Handler {
-	return func(res http.ResponseWriter, req *http.Request, c Context, log *log.Logger) {
+	return func(res http.ResponseWriter, req *http.Request, c Context, log ILogger) {
 		start := time.Now()
 
 		addr := req.Header.Get("X-Real-IP")

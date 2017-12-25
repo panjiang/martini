@@ -31,13 +31,13 @@ type Martini struct {
 	inject.Injector
 	handlers []Handler
 	action   Handler
-	logger   *log.Logger
+	logger   ILogger
 }
 
 // New creates a bare bones Martini instance. Use this method if you want to have full control over the middleware that is used.
 func New() *Martini {
 	m := &Martini{Injector: inject.New(), action: func() {}, logger: log.New(os.Stdout, "[martini] ", 0)}
-	m.Map(m.logger)
+	m.Map(m.logger.(ILogger))
 	m.Map(defaultReturnHandler())
 	return m
 }
@@ -58,9 +58,9 @@ func (m *Martini) Action(handler Handler) {
 }
 
 // Logger sets the logger
-func (m *Martini) Logger(logger *log.Logger) {
+func (m *Martini) Logger(logger ILogger) {
 	m.logger = logger
-	m.Map(m.logger)
+	m.MapTo(m.logger, (*ILogger)(nil))
 }
 
 // Use adds a middleware Handler to the stack. Will panic if the handler is not a callable func. Middleware Handlers are invoked in the order that they are added.
@@ -81,9 +81,8 @@ func (m *Martini) RunOnAddr(addr string) {
 	// calling http.ListenAndServer directly, so that it could be stored in the martini struct for later use.
 	// This would also allow to improve testing when a custom host and port are passed.
 
-	logger := m.Injector.Get(reflect.TypeOf(m.logger)).Interface().(*log.Logger)
-	logger.Printf("listening on %s (%s)\n", addr, Env)
-	logger.Fatalln(http.ListenAndServe(addr, m))
+	m.logger.Printf("listening on %s (%s)\n", addr, Env)
+	m.logger.Fatalln(http.ListenAndServe(addr, m))
 }
 
 // Run the http server. Listening on os.GetEnv("PORT") or 3000 by default.

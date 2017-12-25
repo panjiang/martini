@@ -1,7 +1,6 @@
 package martini
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"path"
@@ -57,7 +56,7 @@ func Static(directory string, staticOpt ...StaticOptions) Handler {
 	dir := http.Dir(directory)
 	opt := prepareStaticOptions(staticOpt)
 
-	return func(res http.ResponseWriter, req *http.Request, log *log.Logger) {
+	return func(res http.ResponseWriter, req *http.Request, log ILogger) {
 		if req.Method != "GET" && req.Method != "HEAD" {
 			return
 		}
