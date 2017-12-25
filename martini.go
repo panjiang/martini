@@ -81,7 +81,6 @@ func (m *Martini) RunOnAddr(addr string) {
 	// calling http.ListenAndServer directly, so that it could be stored in the martini struct for later use.
 	// This would also allow to improve testing when a custom host and port are passed.
 
-	m.logger.Printf("listening on %s (%s)\n", addr, Env)
 	m.logger.Fatalln(http.ListenAndServe(addr, m))
 }
 
